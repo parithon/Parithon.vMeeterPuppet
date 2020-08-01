@@ -9,18 +9,7 @@
                 <span class="fill"></span>
             </span>
             <span class="label">@Model.Label</span>
-            <input id="@(Model.Id).Gain" type="range" class="fader" min="-60" max="12" value="@Model.Gain" step="0.1" list="@(Model.Id).Gain_list" />
-            <datalist id="@(Model.Id).Gain_list">
-                <option value="12" label="12"></option>
-                <option value="6"></option>
-                <option value="0" label="0"></option>
-                <option value="-10"></option>
-                <option value="-20"></option>
-                <option value="-30"></option>
-                <option value="-40"></option>
-                <option value="-50"></option>
-                <option value="-60" label="-60"></option>
-            </datalist>
+            <input id="@(Model.Id).Gain" type="range" class="fader" min="-60" max="12" value="@Model.Gain" step="0.1" />
         </div>
         <div class="iopanel">
             <label id="@(Model.Id).A1" class="btn btn-outline-info btn-sm btn-rounded btn-checkbox@(Model.A1 ? " active" : "")" data-toggle="button">A1</label>

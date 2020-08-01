@@ -52,7 +52,7 @@ namespace Parithon.Voicemeeter.Service
         CheckForUpdate($"{id}.Mono", await TryGetFloatValueAsync($"{id}.Mono") > 0);
         CheckForUpdate($"{id}.Mute", await TryGetFloatValueAsync($"{id}.Mute") > 0);
         CheckForUpdate($"{id}.Gain", await TryGetFloatValueAsync($"{id}.Gain"));
-        CheckForUpdate($"{id}.Label", await TryGetStringValueAsync($"{id}.Label"));
+        CheckForUpdate($"{id}.Label", await TryGetStringValueAsync($"{id}.Label", "Virtual"));
         CheckForUpdate($"{id}.Solo", await TryGetFloatValueAsync($"{id}.Solo") > 0);
         CheckForUpdate($"{id}.Level", await TryGetFloatValueAsync($"{id}.Level"));
         CheckForUpdate($"{id}.MC", await TryGetFloatValueAsync($"{id}.MC") > 0);
@@ -92,10 +92,10 @@ namespace Parithon.Voicemeeter.Service
         }
       }
 
-      async Task<string> TryGetStringValueAsync(string paramName)
+      async Task<string> TryGetStringValueAsync(string paramName, string defaultValue = "")
       {
         (int result, string value) = await _remote.GetParameterStringAsync(paramName);
-        if (result < 0) return string.Empty;
+        if (result < 0 || value.Length == 0) return defaultValue;
         return value;
       }
 
