@@ -1,0 +1,39 @@
+﻿@model Parithon.Voicemeeter.Service.Models.MixerChannelViewModel
+
+<div id="@Model.Id" class="channel">
+    <div class="channel-header">@Model.Label</div>
+    <div class="channel-body">
+        <div class="fader-container">
+            <span id="@(Model.Id).Gain_value" class="value">@Model.Gain</span>
+            <span class="bar">
+                <span class="fill"></span>
+            </span>
+            <span class="label">@Model.Label</span>
+            <input id="@(Model.Id).Gain" type="range" class="fader" min="-60" max="12" value="@Model.Gain" step="0.1" list="@(Model.Id).Gain_list" />
+            <datalist id="@(Model.Id).Gain_list">
+                <option value="12" label="12"></option>
+                <option value="6"></option>
+                <option value="0" label="0"></option>
+                <option value="-10"></option>
+                <option value="-20"></option>
+                <option value="-30"></option>
+                <option value="-40"></option>
+                <option value="-50"></option>
+                <option value="-60" label="-60"></option>
+            </datalist>
+        </div>
+        <div class="iopanel">
+            <label id="@(Model.Id).A1" class="btn btn-outline-info btn-sm btn-rounded btn-checkbox@(Model.A1 ? " active" : "")" data-toggle="button">A1</label>
+            <label id="@(Model.Id).A2" class="btn btn-outline-info btn-sm btn-rounded btn-checkbox@(Model.A2 ? " active" : "")" data-toggle="button">A2</label>
+            <label id="@(Model.Id).A3" class="btn btn-outline-info btn-sm btn-rounded btn-checkbox@(Model.A3 ? " active" : "")" data-toggle="button">A3</label>
+            <label id="@(Model.Id).A4" class="btn btn-outline-info btn-sm btn-rounded btn-checkbox@(Model.A4 ? " active" : "")" data-toggle="button">A4</label>
+            <label id="@(Model.Id).A5" class="btn btn-outline-info btn-sm btn-rounded btn-checkbox@(Model.A5 ? " active" : "")" data-toggle="button">A5</label>
+            <label id="@(Model.Id).B1" class="btn btn-outline-info btn-sm btn-rounded btn-checkbox@(Model.B1 ? " active" : "")" data-toggle="button">B1</label>
+            <label id="@(Model.Id).B2" class="btn btn-outline-info btn-sm btn-rounded btn-checkbox@(Model.B2 ? " active" : "")" data-toggle="button">B2</label>
+            <label id="@(Model.Id).B3" class="btn btn-outline-info btn-sm btn-rounded btn-checkbox@(Model.B3 ? " active" : "")" data-toggle="button">B3</label>
+            <label id="@(Model.Id).Mono" class="btn btn-outline-info btn-sm btn-rounded btn-checkbox@(Model.Mono ? " active" : "")" data-toggle="button">mono</label>
+            <label id="@(Model.Id).Solo" class="btn btn-outline-warning btn-sm btn-rounded btn-checkbox@(Model.Solo ? " active" : "")" data-toggle="button">solo</label>
+            <label id="@(Model.Id).Mute" class="btn btn-outline-danger btn-sm btn-rounded btn-checkbox@(Model.Mute ? " active" : "")" data-toggle="button">Mute</label>
+        </div>
+    </div>
+</div>

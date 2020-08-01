@@ -1,0 +1,95 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome!</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div class="channels">
+    @foreach (var channel in Model.Channels)
+    {
+        <partial name="_MixerChannel" model="channel" />
+    }
+</div>
+
+@section Scripts {
+<script src="~/lib/signalr/dist/browser/signalr.min.js"></script>
+<script type="text/javascript">
+    "use strict";
+
+    async function start() {
+        try {
+            await connection.start();
+            console.assert(connection.state === signalR.HubConnectionState.Connected);
+            console.log("connected");
+            // TODO: enable controls
+        } catch (err) {
+            console.assert(connection.state === signalR.HubConnectionState.Disconnected);
+            console.log(err);
+            // TODO: disable controls
+        }
+    };
+
+    function OnReceivedParameterUpdate(e) {
+        if (typeof e.newValue === "boolean") {
+            $(`Label[id="${e.id}"]`).button('toggle');
+        }
+        else if (typeof e.newValue === "number") {
+            $(`input[id="${e.id}"]`).val(e.newValue);
+        }
+        console.log(`${e.id}`, e);
+    }
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/voicemeeter")
+        .withAutomaticReconnect()
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+    connection.on("ReceivedParameterUpdate", OnReceivedParameterUpdate);
+    connection.onreconnecting(error => {
+        console.assert(connection.state === signalR.HubConnectionState.Reconnecting);
+        if (error) {
+            console.error("An error occurred which disconnected the hub", error);
+        }
+        // TODO: disable controls until we are connected
+    });
+    connection.onreconnected(connectionId => {
+        console.assert(connection.state === signalR.HubConnectionState.Connected);
+        // TODO: enable controls
+    });
+    connection.onclose(error => {
+        console.assert(connection.state === signalR.HubConnectionState.Disconnected);
+        if (error) {
+            console.error("An error occurred which disconnected the hub", error);
+        }
+        // TODO: disable controls
+    });
+
+    $('document').ready(function () {
+        start();
+        $('label.btn').click(function () {
+            const paramId = $(this).attr("id");
+            const isActive = !$(this).hasClass('active');
+            console.log(`${paramId}: ${isActive}`);
+            connection.invoke('SetParameterBooleanValue', paramId, isActive);
+        });
+        $('input.fader').on('input', function () {
+            const paramId = $(this).attr("id");
+            const value = $(this).val();
+            $(`span[id="${paramId}_value"]`).text(value);
+            connection.invoke('SetParameterFloatValue', paramId, parseFloat(value));
+        });
+        $('input.fader').dblclick(function () {
+            const paramId = $(this).attr("id");
+            $(this).val(0);
+            $(`span[id="${paramId}_value"]`).text(0);
+            connection.invoke('SetParameterFloatValue', paramId, 0);
+        });
+    });
+</script>
+}
