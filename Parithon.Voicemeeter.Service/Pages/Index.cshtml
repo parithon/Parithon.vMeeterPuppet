@@ -38,12 +38,33 @@
         }
     };
 
+    function OnVoicemeeterStarted() {
+        console.log("Voicemeeter has been started.");
+        $('.channels').show();
+    }
+
+    function OnVoicemeeterClosed() {
+        console.log("Voicemeeter has been closed.");
+        $('.channels').hide();
+    }
+
+    function OnVoicemeeterTypeChanged() {
+        console.log("Voicemeeter changed, reloading website");
+        alert("Voicemeeter type changed, reloading website...");
+        window.location.reload(true)
+    }
+
     function OnReceivedParameterUpdate(e) {
         if (typeof e.newValue === "boolean") {
             $(`Label[id="${e.id}"]`).button('toggle');
         }
         else if (typeof e.newValue === "number") {
             $(`input[id="${e.id}"]`).val(e.newValue);
+        }
+        else if (e.id.includes("Label")) {
+            console.log('changing label');
+            $(`div[id="${e.id}_header"]`).html(e.newValue);
+            $(`span[id="${e.id}"]`).html(e.newValue);
         }
         console.log(`${e.id}`, e);
     }
@@ -80,6 +101,9 @@
         .configureLogging(signalR.LogLevel.Information)
         .build();
 
+    connection.on("VoicemeeterStarted", OnVoicemeeterStarted);
+    connection.on("VoicemeeterClosed", OnVoicemeeterClosed);
+    connection.on("VoicemeeterTypeChanged", OnVoicemeeterTypeChanged);
     connection.on("ReceivedParameterUpdate", OnReceivedParameterUpdate);
     connection.onreconnecting(error => {
         console.assert(connection.state === signalR.HubConnectionState.Reconnecting);

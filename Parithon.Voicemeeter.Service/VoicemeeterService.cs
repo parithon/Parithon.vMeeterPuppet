@@ -27,6 +27,7 @@ namespace Parithon.Voicemeeter.Service
     }
 
     public bool IsConnected { get; private set; }
+    public VoicemeeterType MixerType { get; private set; }
 
     private string Caller = string.Empty;
 
@@ -42,31 +43,38 @@ namespace Parithon.Voicemeeter.Service
       await _remote.SetParameterFloatAsync(paramName, value ? 1 : 0);
     }
 
-    private async Task GetParameter(Range stripIds, int physicalChannels, int virtualChannels)
+    private async Task GetParameter((int channelCount, ChannelParameterType[] parameters) hwInputChannels, (int channelCount, ChannelParameterType[] parameters) virtualInputChannels, int hwOutputChannels, int virtualOutputChannels)
     {
-      //var changes = new Queue<(string id, dynamic oldValue, dynamic newValue)>();
-
-      for (var stripId = stripIds.Start.Value; stripId <= stripIds.End.Value; stripId++)
+      for (var hwInputChannel = 0; hwInputChannel < hwInputChannels.channelCount; hwInputChannel++)
       {
-        var id = $"Strip[{stripId}]";
-        CheckForUpdate($"{id}.Mono", await TryGetFloatValueAsync($"{id}.Mono") > 0);
-        CheckForUpdate($"{id}.Mute", await TryGetFloatValueAsync($"{id}.Mute") > 0);
+        var id = $"Strip[{hwInputChannel}]";
+        CheckForUpdate($"{id}.Label", await TryGetStringValueAsync($"{id}.Label", $"{hwInputChannel + 1}"));
         CheckForUpdate($"{id}.Gain", await TryGetFloatValueAsync($"{id}.Gain"));
-        CheckForUpdate($"{id}.Label", await TryGetStringValueAsync($"{id}.Label", "Virtual"));
-        CheckForUpdate($"{id}.Solo", await TryGetFloatValueAsync($"{id}.Solo") > 0);
-        CheckForUpdate($"{id}.Level", await TryGetFloatValueAsync($"{id}.Level"));
-        CheckForUpdate($"{id}.MC", await TryGetFloatValueAsync($"{id}.MC") > 0);
-
-        for (var physicalChannel = 0; physicalChannel <= physicalChannels; physicalChannel++)
+        foreach (var parameter in hwInputChannels.parameters)
         {
-          var pc = $"{id}.A{physicalChannel + 1}";
-          CheckForUpdate(pc, await TryGetFloatValueAsync(pc) > 0);
+          var paramName = Enum.GetName(typeof(ChannelParameterType), parameter);
+          CheckForUpdate($"{id}.{paramName}", await TryGetFloatValueAsync($"{id}.{paramName}") > 0);
         }
+      }
 
-        for (var virtualChannel = 0; virtualChannel <= virtualChannels; virtualChannel++)
+      for (var virtInput = 0; virtInput < virtualInputChannels.channelCount; virtInput++)
+      {
+        var id = $"Strip[{virtInput + hwInputChannels.channelCount}]";
+        var virtNames = new[]
         {
-          var vc = $"{id}.B{virtualChannel + 1}";
-          CheckForUpdate(vc, await TryGetFloatValueAsync(vc) > 0);
+          "VAIO",
+          "AUX",
+          "VAIO 3"
+        };
+        CheckForUpdate($"{id}.Label", await TryGetStringValueAsync($"{id}.Label", virtNames[virtInput]));
+        foreach (var parameter in virtualInputChannels.parameters)
+        {
+          var paramName = Enum.GetName(typeof(ChannelParameterType), parameter);
+          if (virtNames[virtInput] == "AUX" && paramName == "MC")
+          {
+            paramName = "K";
+          }
+          CheckForUpdate($"{id}.{paramName}", await TryGetFloatValueAsync($"{id}.{paramName}") > 0);
         }
       }
 
@@ -118,33 +126,108 @@ namespace Parithon.Voicemeeter.Service
         _ => false,
       };
 
-      (int vmResult, VoicemeeterType vmType) = await _remote.GetVoicemeeterTypeAsync();
-      if (vmResult < 0)
-        throw new ApplicationException("An error occurred while communicating with the Voicemeeter Remote API");
-      
       while (!stoppingToken.IsCancellationRequested)
       {
-        int isDirtyValue = await _remote.IsParametersDirtyAsync();
-        if (isDirtyValue < 0)
-          throw new ApplicationException("An error occurred whil communicating with the Voicemeeter Remote API");
-
-        if (isDirtyValue > 0)
+        (int verResult, Version version) = await _remote.GetVoicemeeterVersionAsync();
+        if (verResult < 0 && this.IsConnected)
         {
-          _logger.LogInformation("Parameters are dirty, updating...");
-          switch (vmType)
+          await _hub.Clients.All.SendAsync("VoicemeeterClosed");
+        }
+        if (verResult == 0 && !this.IsConnected)
+        {
+          await _hub.Clients.All.SendAsync("VoicemeeterStarted");
+        }
+        this.IsConnected = verResult >= 0;
+
+        if (this.IsConnected)
+        {
+          (int vmResult, VoicemeeterType vmType) = await _remote.GetVoicemeeterTypeAsync();
+          if (vmResult < 0)
+            throw new ApplicationException("An error occurred while communicating with the Voicemeeter Remote API");
+
+          if (vmType != this.MixerType)
           {
-            case VoicemeeterType.Voicemeeter:
-              await GetParameter(0..2, 2, 0);
-              break;
-            case VoicemeeterType.VoicemeeterBanana:
-              await GetParameter(0..4, 3, 2);
-              break;
-            case VoicemeeterType.VoicemeeterPotato:
-              await GetParameter(0..7, 5, 3);
-              break;
+            this.MixerType = vmType;
+            this.Parameters.Clear();
+            await _hub.Clients.All.SendAsync("VoicemeeterTypeChanged");
           }
-          _logger.LogInformation("Retrieved all parameters");
-          this.Caller = string.Empty;
+
+          int isDirtyValue = await _remote.IsParametersDirtyAsync();
+          if (isDirtyValue < 0)
+            throw new ApplicationException("An error occurred while communicating with the Voicemeeter Remote API");
+
+          if (isDirtyValue > 0)
+          {
+            _logger.LogInformation("Parameters are dirty, updating...");
+            switch (vmType)
+            {
+              case VoicemeeterType.Voicemeeter:
+                await GetParameter((2, new[] {
+                ChannelParameterType.A1,
+                ChannelParameterType.B1,
+                ChannelParameterType.Mono,
+                ChannelParameterType.Solo,
+                ChannelParameterType.Mute
+              }), (1, new[] {
+                ChannelParameterType.A1,
+                ChannelParameterType.B1,
+                ChannelParameterType.MC,
+                ChannelParameterType.Solo,
+                ChannelParameterType.Mute
+              }), 1, 1);
+                break;
+              case VoicemeeterType.VoicemeeterBanana:
+                await GetParameter((3, new[] {
+                ChannelParameterType.A1,
+                ChannelParameterType.A2,
+                ChannelParameterType.A3,
+                ChannelParameterType.B1,
+                ChannelParameterType.B2,
+                ChannelParameterType.Mono,
+                ChannelParameterType.Solo,
+                ChannelParameterType.Mute
+              }), (2, new[] {
+                ChannelParameterType.A1,
+                ChannelParameterType.A2,
+                ChannelParameterType.A3,
+                ChannelParameterType.B1,
+                ChannelParameterType.B2,
+                ChannelParameterType.MC,
+                ChannelParameterType.Solo,
+                ChannelParameterType.Mute
+              }), 3, 2);
+                break;
+              case VoicemeeterType.VoicemeeterPotato:
+                await GetParameter((5, new[] {
+                  ChannelParameterType.A1,
+                  ChannelParameterType.A2,
+                  ChannelParameterType.A3,
+                  ChannelParameterType.A4,
+                  ChannelParameterType.A5,
+                  ChannelParameterType.B1,
+                  ChannelParameterType.B2,
+                  ChannelParameterType.B3,
+                  ChannelParameterType.Mono,
+                  ChannelParameterType.Solo,
+                  ChannelParameterType.Mute
+                }), (3, new[] {
+                  ChannelParameterType.A1,
+                  ChannelParameterType.A2,
+                  ChannelParameterType.A3,
+                  ChannelParameterType.A4,
+                  ChannelParameterType.A5,
+                  ChannelParameterType.B1,
+                  ChannelParameterType.B2,
+                  ChannelParameterType.B3,
+                  ChannelParameterType.MC,
+                  ChannelParameterType.Solo,
+                  ChannelParameterType.Mute
+                }), 5, 3);
+                break;
+            }
+            _logger.LogInformation("Retrieved all parameters");
+            this.Caller = string.Empty;
+          }
         }
 
         await Task.Delay(20);
