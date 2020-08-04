@@ -1,0 +1,21 @@
+﻿@model MixerChannelViewModel
+
+<div id="@Model.Id" class="channel">
+    <div id="@(Model.Id).Label_header" class="channel-header">@Model.Label</div>
+    <div class="channel-body">
+        <div class="fader-container">
+            <span id="@(Model.Id).Gain_value" class="value">@Model.Gain</span>
+            <span class="bar">
+                <span class="fill"></span>
+            </span>
+            <span id="@(Model.Id).Label" class="label">@Model.Label</span>
+            <input id="@(Model.Id).Gain" type="range" class="fader" min="-60" max="12" value="@Model.Gain" step="0.1" />
+        </div>
+        <div class="iopanel">
+            @foreach (var io in Model.InputOutputChannels)
+            {
+                <label id="@io.Id" class="btn btn-outline-info btn-sm btn-rounded btn-checkbox@(io.Value ?? false ? " active" : "")" data-toggle="button">@(io.ParamName)</label>
+            }
+            </div>
+        </div>
+    </div>

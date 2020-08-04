@@ -1,0 +1,164 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="channels">
+    @foreach (var channel in Model.Channels)
+    {
+        <partial name="_MixerChannel" model="channel" />
+    }
+</div>
+
+@section Head {
+    <link rel="stylesheet" href="~/css/mixerChannel.css" />
+}
+
+@section Scripts {
+<script src="~/lib/signalr/dist/browser/signalr.min.js"></script>
+<script type="text/javascript">
+    "use strict";
+
+    async function start() {
+        try {
+            await connection.start();
+            console.assert(connection.state === signalR.HubConnectionState.Connected);
+            console.log("connected");
+            // TODO: enable controls
+        } catch (err) {
+            console.assert(connection.state === signalR.HubConnectionState.Disconnected);
+            console.log(err);
+            // TODO: disable controls
+        }
+    };
+
+    function OnVoicemeeterStarted() {
+        console.log("Voicemeeter has been started.");
+        $('.channels').show();
+    }
+
+    function OnVoicemeeterClosed() {
+        console.log("Voicemeeter has been closed.");
+        $('.channels').hide();
+    }
+
+    function OnVoicemeeterTypeChanged() {
+        console.log("Voicemeeter changed, reloading website");
+        alert("Voicemeeter type changed, reloading website...");
+        window.location.reload(true)
+    }
+
+    function OnReceivedParameterUpdate(e) {
+        if (typeof e.newValue === "boolean") {
+            $(`Label[id="${e.id}"]`).button('toggle');
+        }
+        else if (typeof e.newValue === "number") {
+            $(`input[id="${e.id}"]`).val(e.newValue);
+        }
+        else if (e.id.includes("Label")) {
+            console.log('changing label');
+            $(`div[id="${e.id}_header"]`).html(e.newValue);
+            $(`span[id="${e.id}"]`).html(e.newValue);
+        }
+        console.log(`${e.id}`, e);
+    }
+
+    function setBar($this, $fader, $fill, $value) {
+        const min = parseInt($fader.attr("min"))
+        const max = parseInt($fader.attr("max"))
+        const value = parseFloat($fader.val())
+        const percentage = ((value - min) / (max - min)) * 100
+
+        if (value > 0) {
+            $this.addClass("amplified")
+        }
+        else {
+            $this.removeClass("amplified")
+        }
+
+        if (value < 0) {
+            $value.css("margin-left", "-.4rem")
+        }
+        else {
+            $value.css("margin-left", "")
+        }
+
+        $fill.css("height", percentage + "%")
+        $value.css("line-height", ((($fader.width() * 2 - 120) * (100 - percentage) / 100) + 60) + "px");
+        $value.text(value)
+
+    }
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/voicemeeter")
+        .withAutomaticReconnect()
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+    connection.on("VoicemeeterStarted", OnVoicemeeterStarted);
+    connection.on("VoicemeeterClosed", OnVoicemeeterClosed);
+    connection.on("VoicemeeterTypeChanged", OnVoicemeeterTypeChanged);
+    connection.on("ReceivedParameterUpdate", OnReceivedParameterUpdate);
+    connection.onreconnecting(error => {
+        console.assert(connection.state === signalR.HubConnectionState.Reconnecting);
+        if (error) {
+            console.error("An error occurred which disconnected the hub", error);
+        }
+        $('.channels').hide();
+    });
+    connection.onreconnected(connectionId => {
+        console.assert(connection.state === signalR.HubConnectionState.Connected);
+        $('.channels').show();
+    });
+    connection.onclose(error => {
+        console.assert(connection.state === signalR.HubConnectionState.Disconnected);
+        if (error) {
+            console.error("An error occurred which disconnected the hub", error);
+        }
+        $('.channels').hide();
+    });
+
+    $('document').ready(function () {
+        start();
+        $('label.btn').click(function () {
+            const paramId = $(this).attr("id");
+            const isActive = !$(this).hasClass('active');
+            console.log(`${paramId}: ${isActive}`);
+            connection.invoke('SetParameterBooleanValue', paramId, isActive);
+        });
+        $('input.fader').on('input', function () {
+            const paramId = $(this).attr("id");
+            const value = $(this).val();
+            $(`span[id="${paramId}_value"]`).text(value);
+            connection.invoke('SetParameterFloatValue', paramId, parseFloat(value));
+        });
+        $('input.fader').dblclick(function () {
+            const paramId = $(this).attr("id");
+            $(this).val(0);
+            $(`span[id="${paramId}_value"]`).text(0);
+            connection.invoke('SetParameterFloatValue', paramId, 0);
+        });
+
+        const $faderContainers = $('.fader-container')
+
+        $faderContainers.each(function () {
+            const $this = $(this);
+            const $fill = $this.find(".bar .fill");
+            const $fader = $this.find(".fader");
+            const $value = $this.find(".value");
+
+            $this.height($this.parent().height());
+            $fader.width($this.parent().height());
+
+            $fader.on("input", () => setBar($this, $fader, $fill, $value));
+            $fader.on("dblclick", () => {
+                $fader.val(0);
+                setBar($this, $fader, $fill, $value);
+            });
+
+            setBar($this, $fader, $fill, $value);
+        });
+    });
+</script>
+}
