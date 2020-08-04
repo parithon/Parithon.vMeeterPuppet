@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Win32;
 
-namespace Parithon.Voicemeeter.Proxy.Helpers
+namespace Parithon.vMeeterPuppet.Proxy.Helpers
 {
   public static class VoicemeeterHelpers
   {

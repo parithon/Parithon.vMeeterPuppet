@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Parithon.Voicemeeter.Service
+namespace Parithon.vMeeterPuppet.Service
 {
   public class Program
   {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Parithon.Voicemeeter.Service.Models
+namespace Parithon.vMeeterPuppet.Service.Models
 {
   public class ChannelParameterViewModel
   {

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
-namespace Parithon.Voicemeeter.Service.Hubs
+namespace Parithon.vMeeterPuppet.Service.Hubs
 {
   public class VoicemeeterHub : Hub
   {

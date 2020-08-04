@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using Parithon.Voicemeeter.Proxy;
-using Parithon.Voicemeeter.Service.Models;
+using Parithon.vMeeterPuppet.Proxy;
+using Parithon.vMeeterPuppet.Service.Models;
 
-namespace Parithon.Voicemeeter.Service.Pages
+namespace Parithon.vMeeterPuppet.Service.Pages
 {
   public class IndexModel : PageModel
   {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Parithon.Voicemeeter.Proxy
+namespace Parithon.vMeeterPuppet.Proxy
 {
   public enum VoicemeeterType
   {

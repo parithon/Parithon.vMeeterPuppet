@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Parithon.Voicemeeter.Proxy.Helpers
+namespace Parithon.vMeeterPuppet.Proxy.Helpers
 {
   internal static class InteropHelpers
   {

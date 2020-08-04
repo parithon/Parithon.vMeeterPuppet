@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace Parithon.Voicemeeter.Service.Pages
+namespace Parithon.vMeeterPuppet.Service.Pages
 {
     public class PrivacyModel : PageModel
     {

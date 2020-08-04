@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Parithon.Voicemeeter.Proxy.Helpers;
+using Parithon.vMeeterPuppet.Proxy.Helpers;
 
-namespace Parithon.Voicemeeter.Proxy
+namespace Parithon.vMeeterPuppet.Proxy
 {
   public class VoicemeeterRemote
   {

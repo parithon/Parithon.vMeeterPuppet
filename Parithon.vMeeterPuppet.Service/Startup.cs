@@ -9,10 +9,10 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Parithon.Voicemeeter.Proxy;
-using Parithon.Voicemeeter.Service.Hubs;
+using Parithon.vMeeterPuppet.Proxy;
+using Parithon.vMeeterPuppet.Service.Hubs;
 
-namespace Parithon.Voicemeeter.Service
+namespace Parithon.vMeeterPuppet.Service
 {
   public class Startup
   {

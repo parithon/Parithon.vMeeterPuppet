@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Parithon.Voicemeeter.Proxy;
-using Parithon.Voicemeeter.Service.Hubs;
-using Parithon.Voicemeeter.Service.Models;
+using Parithon.vMeeterPuppet.Proxy;
+using Parithon.vMeeterPuppet.Service.Hubs;
+using Parithon.vMeeterPuppet.Service.Models;
 
-namespace Parithon.Voicemeeter.Service
+namespace Parithon.vMeeterPuppet.Service
 {
   public class VoicemeeterService : BackgroundService
   {
