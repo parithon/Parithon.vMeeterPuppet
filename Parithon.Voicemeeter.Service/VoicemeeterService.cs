@@ -163,39 +163,39 @@ namespace Parithon.Voicemeeter.Service
             {
               case VoicemeeterType.Voicemeeter:
                 await GetParameter((2, new[] {
-                ChannelParameterType.A1,
-                ChannelParameterType.B1,
-                ChannelParameterType.Mono,
-                ChannelParameterType.Solo,
-                ChannelParameterType.Mute
-              }), (1, new[] {
-                ChannelParameterType.A1,
-                ChannelParameterType.B1,
-                ChannelParameterType.MC,
-                ChannelParameterType.Solo,
-                ChannelParameterType.Mute
-              }), 1, 1);
+                  ChannelParameterType.A1,
+                  ChannelParameterType.B1,
+                  ChannelParameterType.Mono,
+                  ChannelParameterType.Solo,
+                  ChannelParameterType.Mute
+                }), (1, new[] {
+                  ChannelParameterType.A1,
+                  ChannelParameterType.B1,
+                  ChannelParameterType.MC,
+                  ChannelParameterType.Solo,
+                  ChannelParameterType.Mute
+                }), 1, 1);
                 break;
               case VoicemeeterType.VoicemeeterBanana:
                 await GetParameter((3, new[] {
-                ChannelParameterType.A1,
-                ChannelParameterType.A2,
-                ChannelParameterType.A3,
-                ChannelParameterType.B1,
-                ChannelParameterType.B2,
-                ChannelParameterType.Mono,
-                ChannelParameterType.Solo,
-                ChannelParameterType.Mute
-              }), (2, new[] {
-                ChannelParameterType.A1,
-                ChannelParameterType.A2,
-                ChannelParameterType.A3,
-                ChannelParameterType.B1,
-                ChannelParameterType.B2,
-                ChannelParameterType.MC,
-                ChannelParameterType.Solo,
-                ChannelParameterType.Mute
-              }), 3, 2);
+                  ChannelParameterType.A1,
+                  ChannelParameterType.A2,
+                  ChannelParameterType.A3,
+                  ChannelParameterType.B1,
+                  ChannelParameterType.B2,
+                  ChannelParameterType.Mono,
+                  ChannelParameterType.Solo,
+                  ChannelParameterType.Mute
+                }), (2, new[] {
+                  ChannelParameterType.A1,
+                  ChannelParameterType.A2,
+                  ChannelParameterType.A3,
+                  ChannelParameterType.B1,
+                  ChannelParameterType.B2,
+                  ChannelParameterType.MC,
+                  ChannelParameterType.Solo,
+                  ChannelParameterType.Mute
+                }), 3, 2);
                 break;
               case VoicemeeterType.VoicemeeterPotato:
                 await GetParameter((5, new[] {

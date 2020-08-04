@@ -29,9 +29,12 @@ namespace Parithon.Voicemeeter.Service
     public void ConfigureServices(IServiceCollection services)
     {
       var builder = services.AddRazorPages();
+
+#if DEBUG
       if (Environment.IsDevelopment()) {
         builder.AddRazorRuntimeCompilation();
       }
+#endif
 
       services.AddSingleton<VoicemeeterRemote>();
       services.AddSingleton<VoicemeeterService>();

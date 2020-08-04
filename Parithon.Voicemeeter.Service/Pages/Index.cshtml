@@ -4,11 +4,6 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome!</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
-
 <div class="channels">
     @foreach (var channel in Model.Channels)
     {
@@ -110,18 +105,18 @@
         if (error) {
             console.error("An error occurred which disconnected the hub", error);
         }
-        // TODO: disable controls until we are connected
+        $('.channels').hide();
     });
     connection.onreconnected(connectionId => {
         console.assert(connection.state === signalR.HubConnectionState.Connected);
-        // TODO: enable controls
+        $('.channels').show();
     });
     connection.onclose(error => {
         console.assert(connection.state === signalR.HubConnectionState.Disconnected);
         if (error) {
             console.error("An error occurred which disconnected the hub", error);
         }
-        // TODO: disable controls
+        $('.channels').hide();
     });
 
     $('document').ready(function () {

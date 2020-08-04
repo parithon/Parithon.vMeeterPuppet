@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parithon.Voicemeeter.Service", "Parithon.Voicemeeter.Service\Parithon.Voicemeeter.Service.csproj", "{928D8E28-F447-458F-94E7-43E991E6EC16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parithon.Voicemeeter.Proxy", "Parithon.Voicemeeter.Proxy\Parithon.Voicemeeter.Proxy.csproj", "{6D6C42DC-1636-4CFF-8F70-48D71DB2A376}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parithon.Voicemeeter.Proxy", "Parithon.Voicemeeter.Proxy\Parithon.Voicemeeter.Proxy.csproj", "{6D6C42DC-1636-4CFF-8F70-48D71DB2A376}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
